@@ -14,6 +14,7 @@
  #include "task_counter.h"
  #include "task_display.h"
  #include "button_utils.h"
+ #include "globals.h"
  
  // Global semaphores
  SemaphoreHandle_t button1_semaphore;
@@ -31,6 +32,7 @@
  
  void setup() {
    /* Initialize Serial communication */
+   setupPrintf();
    Serial.begin(9600);
    while (!Serial) {
      ; // Wait for serial port to connect
@@ -47,8 +49,8 @@
    digitalWrite(LED1_PIN, LOW);
    digitalWrite(LED2_PIN, LOW);
    
-   Serial.println(F("FreeRTOS Multiple Tasks Application"));
-   Serial.println(F("-------------------------------------"));
+   printf("FreeRTOS Multiple Tasks Application");
+   printf("-------------------------------------");
    
    /* Create semaphores */
    button1_semaphore = xSemaphoreCreateBinary();

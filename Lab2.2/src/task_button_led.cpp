@@ -8,6 +8,7 @@
  #include "config.h"
  #include "button_utils.h"
  #include "task_button_led.h"
+ #include "led.h"
  
  /* Task 1: Button-LED Task - Changes LED1 state on button press */
  void button_led_task(void *pvParameters) {
@@ -25,7 +26,7 @@
      if (current_button_state && !last_button_state) {
        /* Toggle LED1 state */
        led1_state = !led1_state;
-       digitalWrite(LED1_PIN, led1_state ? HIGH : LOW);
+       turnOnLed(LED1_PIN);
        
        /* Signal button press for display task (provider) */
        button1_pressed = true;

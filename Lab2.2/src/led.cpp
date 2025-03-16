@@ -1,26 +1,22 @@
-// led.cpp (unchanged)
-#include "led.h"
-#include <Arduino.h>
+#include "Led.h"
 
-static int ledPin;
-static bool ledState = false;
-
-void initializeLed(int pin) {
-    ledPin = pin;
-    pinMode(ledPin, OUTPUT);
-    digitalWrite(ledPin, LOW);
+Led::Led(uint8_t pin) {
+    this->pin = pin;
+    this->state = false;
+    pinMode(pin, OUTPUT);
 }
 
-void turnOnLed(int pin) {
+void Led::toggle() {
+    state = !state;
+    digitalWrite(pin, state ? HIGH : LOW);
+}
+
+void Led::turnOn() {
+    state = true;
     digitalWrite(pin, HIGH);
-    ledState = true;
 }
 
-void turnOffLed(int pin) {
+void Led::turnOff() {
+    state = false;
     digitalWrite(pin, LOW);
-    ledState = false;
-}
-
-bool getLedState() {
-    return ledState;
 }

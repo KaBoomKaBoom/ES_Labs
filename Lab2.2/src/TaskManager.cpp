@@ -32,6 +32,7 @@ void buttonLedTask(void *pvParameters) {
     
     while (1) {
         if (button.isPressed()) {
+            printf("Button pressed\n");
             led1.turnOn();
             xSemaphoreGive(buttonSemaphore);
             vTaskDelay(pdMS_TO_TICKS(BUTTON_LED_DURATION_MS));

@@ -16,13 +16,30 @@
  }
  
  float sensor_read_distance() {
-   // Measure distance
-   float distance = sonar.ping_cm();
+   // Variables to store pulse timing
+   unsigned long pulse_start, pulse_end;
+   float pulse_duration, distance;
    
-   // If distance is 0, sensor might be out of range or there's an error
-   if (distance == 0) {
-     distance = MAX_DISTANCE; // Set to max distance if no echo received
+   // Clear trigger pin
+   digitalWrite(TRIGGER_PIN, LOW);
+   delayMicroseconds(2);
+   
+   // Send a 10µs pulse to trigger
+   digitalWrite(TRIGGER_PIN, HIGH);
+   delayMicroseconds(10);
+   digitalWrite(TRIGGER_PIN, LOW);
+   
+   // Measure the length of echo pulse
+   pulse_duration = pulseIn(ECHO_PIN, HIGH, 30000); // Timeout after 30ms
+   
+   // If timeout occurred, return max distance
+   if (pulse_duration == 0) {
+     return MAX_DISTANCE;
    }
+   
+   // Calculate distance: pulse duration * speed of sound / 2
+   // (divided by 2 because sound travels to object and back)
+   distance = (pulse_duration * 0.034) / 2.0;
    
    return distance;
  }

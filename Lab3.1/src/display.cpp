@@ -30,8 +30,10 @@
        printf("UNKNOWN\n");
    }
    
+   char buffer[50];
+   dtostrf(signals->distance, 5, 2, buffer);
    // Print distance
-   printf("Distance: %.2f cm\n", signals->distance);
+   printf("Distance: %s cm\n", buffer);
    
    // Print measurement count
    printf("Measurements: %lu\n", (unsigned long)signals->measurementCount);

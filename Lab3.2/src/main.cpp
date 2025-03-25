@@ -31,9 +31,16 @@
  // Mutex for data access protection
  SemaphoreHandle_t data_mutex;
  
+void printDistance(float distance)
+{
+  char buffer[50];
+  dtostrf(distance, 5, 2, buffer);
+  printf("Distance: %s cm\n", buffer);
+}
+
  void setup() {
    // Initialize serial communication
-   Serial.begin(115200);
+   Serial.begin(9600);
    while (!Serial) {
      ; // Wait for serial port to connect
    }
@@ -108,10 +115,21 @@
      if (xSemaphoreTake(data_mutex, portMAX_DELAY) == pdTRUE) {
        // Print results using printf
        printf("Distance Measurements:\n");
-       printf("  Raw: %.2f cm\n", raw_distance);
-       printf("  After Salt & Pepper: %.2f cm\n", filtered_distance1);
-       printf("  After Weighted Avg: %.2f cm\n", filtered_distance2);
-       printf("  Final (Saturated): %.2f cm\n\n", final_distance);
+       char buffer[50];
+       dtostrf(raw_distance, 5, 2, buffer);
+       printf("  Raw: %s cm\n", buffer);
+
+       char buffer1[50];
+       dtostrf(filtered_distance1, 5, 2, buffer1);
+       printf("  After Salt & Pepper: %s cm\n", buffer1);
+
+       char buffer2[50];
+       dtostrf(filtered_distance2, 5, 2, buffer2);
+       printf("  After Weighted Avg: %s cm\n", buffer2);
+
+       char buffer3[50];
+       dtostrf(final_distance, 5, 2, buffer3);
+       printf("  Final (Saturated): %s cm\n\n", buffer3);
        
        // Release mutex
        xSemaphoreGive(data_mutex);

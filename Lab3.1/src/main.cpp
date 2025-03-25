@@ -25,7 +25,7 @@
  
  void setup() {
    // Initialize serial communication
-   Serial.begin(115200);
+   Serial.begin(9600);
    
    // Set up printf to output to Serial
    fdev_setup_stream(&serial_stdout, serialPutchar, NULL, _FDEV_SETUP_WRITE);

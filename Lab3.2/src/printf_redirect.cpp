@@ -1,16 +1,3 @@
-/**
- * Printf Redirection Module (printf_redirect.h)
- */
-#ifndef PRINTF_REDIRECT_H
-#define PRINTF_REDIRECT_H
-
-#include <stdio.h>
-
-// Function prototypes
-void init_printf_redirect(void);
-int serial_putchar(char c, FILE *stream);
-
-#endif /* PRINTF_REDIRECT_H */
 
 /**
  * Printf Redirection Module Implementation (printf_redirect.cpp)
@@ -36,5 +23,5 @@ void init_printf_redirect(void) {
  */
 int serial_putchar(char c, FILE *stream) {
   Serial.write(c);
-  return 0;
+  return c;
 }

@@ -11,6 +11,8 @@
  #include "filter.h"
  #include "printf_redirect.h"
  
+ #define STACK_SIZE 256  // Increase stack size
+
  // Task parameters
  #define STACK_SIZE          128     // Reduced stack size for Arduino Uno
  #define ACQUISITION_PERIOD  100     // Acquisition period in milliseconds
@@ -31,12 +33,13 @@
  // Mutex for data access protection
  SemaphoreHandle_t data_mutex;
  
-void printDistance(float distance)
-{
-  char buffer[50];
-  dtostrf(distance, 5, 2, buffer);
-  printf("Distance: %s cm\n", buffer);
-}
+ void printDistance(const char *label, float distance)
+ {
+   char buffer[10]; // Ensure enough space for the formatted string
+   dtostrf(distance, 5, 2, buffer); // Convert float to string
+   printf("%s: %s cm\n", label, buffer); // Use %s instead of %f
+ }
+ 
 
  void setup() {
    // Initialize serial communication
@@ -115,21 +118,11 @@ void printDistance(float distance)
      if (xSemaphoreTake(data_mutex, portMAX_DELAY) == pdTRUE) {
        // Print results using printf
        printf("Distance Measurements:\n");
-       char buffer[50];
-       dtostrf(raw_distance, 5, 2, buffer);
-       printf("  Raw: %s cm\n", buffer);
-
-       char buffer1[50];
-       dtostrf(filtered_distance1, 5, 2, buffer1);
-       printf("  After Salt & Pepper: %s cm\n", buffer1);
-
-       char buffer2[50];
-       dtostrf(filtered_distance2, 5, 2, buffer2);
-       printf("  After Weighted Avg: %s cm\n", buffer2);
-
-       char buffer3[50];
-       dtostrf(final_distance, 5, 2, buffer3);
-       printf("  Final (Saturated): %s cm\n\n", buffer3);
+       printDistance("Raw", raw_distance);
+       printDistance("After Salt & Pepper", filtered_distance1);
+       printDistance("After Weighted Avg", filtered_distance2);
+       printDistance("Final (Saturated)", final_distance);
+       
        
        // Release mutex
        xSemaphoreGive(data_mutex);

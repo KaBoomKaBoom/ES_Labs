@@ -28,11 +28,11 @@
    
    // Clear trigger pin
    digitalWrite(TRIGGER_PIN, LOW);
-   delayMicroseconds(2);
+   delayMicroseconds(50);
    
    // Send a 10µs pulse to trigger
    digitalWrite(TRIGGER_PIN, HIGH);
-   delayMicroseconds(10);
+   delayMicroseconds(100);
    digitalWrite(TRIGGER_PIN, LOW);
    
    // Measure the length of echo pulse

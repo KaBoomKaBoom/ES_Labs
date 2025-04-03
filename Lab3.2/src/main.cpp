@@ -11,11 +11,10 @@
  #include "filter.h"
  #include "printf_redirect.h"
  
- #define STACK_SIZE 256  // Increase stack size
 
  // Task parameters
- #define STACK_SIZE          128     // Reduced stack size for Arduino Uno
- #define ACQUISITION_PERIOD  100     // Acquisition period in milliseconds
+ #define STACK_SIZE          256    // Reduced stack size for Arduino Uno
+ #define ACQUISITION_PERIOD  500     // Acquisition period in milliseconds
  
  // Signal conditioning parameters
  #define SALT_PEPPER_WINDOW  5       // Window size for salt and pepper filter

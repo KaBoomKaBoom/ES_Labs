@@ -10,8 +10,8 @@
  #include <Arduino.h>
  
  // Pin definitions for HC-SR04 ultrasonic sensor
- #define TRIGGER_PIN 12
- #define ECHO_PIN 13
+ #define TRIGGER_PIN 9
+ #define ECHO_PIN 8
  #define MAX_DISTANCE 400 // Maximum distance to measure (in cm)
  
  /**

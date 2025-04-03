@@ -6,8 +6,8 @@
  #define ULTRASONIC_H
  
  // Pin definitions
- #define TRIGGER_PIN         12
- #define ECHO_PIN            13
+ #define TRIGGER_PIN         9
+ #define ECHO_PIN            8
  
  // Ultrasonic sensor parameters
  #define MAX_DISTANCE_CM     400     // Maximum valid distance in cm

@@ -3,8 +3,10 @@
  * Implementation of serial communication interface using stdio
  */
 
+ #include <stdlib.h> // For atof
+ #include <ctype.h>  // For isspace
  #include "serial_interface.h"
-
+ 
  SerialInterface::SerialInterface() {
      lastPrintTime = 0;
      lastAlertTime = 0;
@@ -29,10 +31,18 @@
          
          // Print status information using printf formatting
          printf("\n--- System Status ---\n");
-         printf("Temperature: %.2f °C\n", temperature);
-         printf("Set Point: %.2f °C\n", setPoint);
-         printf("Hysteresis: ±%.2f °C\n", hysteresis);
-         printf("Thresholds: %.2f to %.2f °C\n", setPoint - hysteresis, setPoint + hysteresis);
+ 
+         char tempStr[32];
+         char setPointStr[32];
+         char hysteresisStr[32];
+ 
+         dtostrf(temperature, 5, 2, tempStr);
+         dtostrf(setPoint, 5, 2, setPointStr);
+         dtostrf(hysteresis, 5, 2, hysteresisStr);
+         
+         printf("Temperature: %s °C\n", tempStr);
+         printf("Set Point: %s °C\n", setPointStr);
+         printf("Hysteresis: ±%s °C\n", hysteresisStr);
          printf("Relay: %s\n", relayState ? "ON" : "OFF");
          printf("-------------------\n");
      }
@@ -54,35 +64,121 @@
      // Check if there's input available and read it
      if (stdio_available()) {
          if (stdio_readstring(command, MAX_CMD_LENGTH)) {
+             // Debug: Print the raw command
+             printf("DEBUG: Received command: '");
+             for (size_t i = 0; command[i] != '\0'; i++) {
+                 if (isprint(command[i])) {
+                     printf("%c", command[i]);
+                 } else {
+                     printf("[0x%02X]", (unsigned char)command[i]);
+                 }
+             }
+             printf("'\n");
+             
              // Process setpoint command
              if (strncmp(command, "set:", 4) == 0) {
+                 // Trim whitespace from the substring
+                 char* valueStr = command + 4;
+                 size_t len = strlen(valueStr);
+                 while (len > 0 && isspace(valueStr[len - 1])) {
+                     valueStr[len - 1] = '\0';
+                     len--;
+                 }
+                 
+                 // Debug: Print the substring to be parsed
+                 printf("DEBUG: Parsing setpoint: '");
+                 for (size_t i = 0; valueStr[i] != '\0'; i++) {
+                     if (isprint(valueStr[i])) {
+                         printf("%c", valueStr[i]);
+                     } else {
+                         printf("[0x%02X]", (unsigned char)valueStr[i]);
+                     }
+                 }
+                 printf("'\n");
+                 
                  float newSetPoint;
-                 if (sscanf(command + 4, "%f", &newSetPoint) == 1) {
+                 if (sscanf(valueStr, "%f", &newSetPoint) == 1) {
                      if (newSetPoint >= MIN_TEMPERATURE && newSetPoint <= MAX_TEMPERATURE) {
                          *currentSetPoint = newSetPoint;
-                         printf("New setpoint: %.2f °C\n", newSetPoint);
+                            // Print the new setpoint using printf formatting
+                            char setPointStr[32];
+                            dtostrf(newSetPoint, 5, 2, setPointStr);
+                            printf("New setpoint: %s °C\n", setPointStr);
+                         
                          return true;
                      } else {
                          printf("Error: Setpoint must be between %.1f and %.1f °C\n", 
                                 MIN_TEMPERATURE, MAX_TEMPERATURE);
                      }
                  } else {
-                     printf("Error: Invalid setpoint format\n");
+                     // Fallback to atof
+                     newSetPoint = atof(valueStr);
+                     if (newSetPoint != 0.0 || strcmp(valueStr, "0") == 0 || strcmp(valueStr, "0.0") == 0) {
+                         if (newSetPoint >= MIN_TEMPERATURE && newSetPoint <= MAX_TEMPERATURE) {
+                             *currentSetPoint = newSetPoint;
+                             char setPointStr[32];
+                             dtostrf(newSetPoint, 5, 2, setPointStr);
+                             printf("New setpoint: %s °C\n", setPointStr);
+                             return true;
+                         } else {
+                             printf("Error: Setpoint must be between %.1f and %.1f °C\n", 
+                                    MIN_TEMPERATURE, MAX_TEMPERATURE);
+                         }
+                     } else {
+                         printf("Error: Invalid setpoint format\n");
+                     }
                  }
              }
              // Process hysteresis command
              else if (strncmp(command, "hyst:", 5) == 0) {
+                 // Trim whitespace from the substring
+                 char* valueStr = command + 5;
+                 size_t len = strlen(valueStr);
+                 while (len > 0 && isspace(valueStr[len - 1])) {
+                     valueStr[len - 1] = '\0';
+                     len--;
+                 }
+                 
+                 // Debug: Print the substring to be parsed
+                 printf("DEBUG: Parsing hysteresis: '");
+                 for (size_t i = 0; valueStr[i] != '\0'; i++) {
+                     if (isprint(valueStr[i])) {
+                         printf("%c", valueStr[i]);
+                     } else {
+                         printf("[0x%02X]", (unsigned char)valueStr[i]);
+                     }
+                 }
+                 printf("'\n");
+                 
                  float newHysteresis;
-                 if (sscanf(command + 5, "%f", &newHysteresis) == 1) {
+                 if (sscanf(valueStr, "%f", &newHysteresis) == 1) {
                      if (newHysteresis > 0) {
                          *currentHysteresis = newHysteresis;
-                         printf("New hysteresis: ±%.2f °C\n", newHysteresis);
+                            // Print the new hysteresis using printf formatting
+                            char hysteresisStr[32];
+                            dtostrf(newHysteresis, 5, 2, hysteresisStr);
+                            printf("New hysteresis: ±%s °C\n", hysteresisStr);
+                         
                          return true;
                      } else {
                          printf("Error: Hysteresis must be positive\n");
                      }
                  } else {
-                     printf("Error: Invalid hysteresis format\n");
+                     // Fallback to atof
+                     newHysteresis = atof(valueStr);
+                     if (newHysteresis != 0.0 || strcmp(valueStr, "0") == 0 || strcmp(valueStr, "0.0") == 0) {
+                         if (newHysteresis > 0) {
+                             *currentHysteresis = newHysteresis;
+                             char hysteresisStr[32];
+                             dtostrf(newHysteresis, 5, 2, hysteresisStr);
+                             printf("New hysteresis: ±%s °C\n", hysteresisStr);
+                             return true;
+                         } else {
+                             printf("Error: Hysteresis must be positive\n");
+                         }
+                     } else {
+                         printf("Error: Invalid hysteresis format\n");
+                     }
                  }
              }
              // Help command
@@ -112,10 +208,13 @@
              alertActive = true;
              lastAlertTime = currentTime;
              
-             // Print alert message
-             printf("\n!!! ALERT !!!\n");
-             printf("Temperature deviation exceeds threshold: %.2f °C\n", deviation);
-             printf("!!!!!!!!!!!!!!!\n");
+             char deviationStr[32];
+                dtostrf(deviation, 5, 2, deviationStr);
+                // Print alert message using printf formatting
+                printf("\n!!! ALERT !!!\n");
+                printf("Temperature deviation exceeds threshold: %s °C\n", deviationStr);
+                printf("!!!!!!!!!!!!!!!\n");
+
              
              return true;
          }

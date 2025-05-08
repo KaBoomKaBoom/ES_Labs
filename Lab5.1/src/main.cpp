@@ -34,9 +34,7 @@
      printf("Initializing controller... ");
      printf("OK\n");
      
-     // Print initial configuration
-     printf("\nInitial setpoint: %.2f °C\n", controller.getSetPoint());
-     printf("Initial hysteresis: ±%.2f °C\n", controller.getHysteresis());
+     
      printf("\nSystem running. Type 'help' for commands.\n");
  }
  

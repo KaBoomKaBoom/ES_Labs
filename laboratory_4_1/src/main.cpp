@@ -13,7 +13,8 @@ void setup() {
 void loop() {
     char command[20];
     if (Serial.available() > 0) {
-        Serial.readBytesUntil('\n', command, sizeof(command) -1);
+        //Serial.readBytesUntil('\n', command, sizeof(command) -1);
+        fgets(command, sizeof(command), stdin); 
         command[strcspn(command, "\r\n")] = 0;
 
         if (strcmp(command, "relay on") == 0) {

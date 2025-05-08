@@ -8,7 +8,7 @@
  
  // DHT Sensor Configuration
  #define DHT_PIN 2           // Digital pin connected to DHT sensor
- #define DHT_TYPE DHT22      // DHT sensor type (DHT11, DHT22, etc.)
+ #define DHT_TYPE DHT11      // DHT sensor type (DHT11, DHT22, etc.)
  #define TEMPERATURE_READ_INTERVAL 2000  // Read temperature every 2 seconds
  
  // Relay Configuration
@@ -22,7 +22,7 @@
  
  // Serial Communication
  #define SERIAL_BAUD_RATE 9600           // Serial communication baud rate
- #define SERIAL_PRINT_INTERVAL 1000      // Update serial output every 1 second
+ #define SERIAL_PRINT_INTERVAL 4000      // Update serial output every 1 second
  
  // Alert Configuration (Bonus Feature)
  #define ALERT_THRESHOLD 5.0             // Temperature deviation threshold for alert (°C)

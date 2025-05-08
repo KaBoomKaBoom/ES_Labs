@@ -9,6 +9,11 @@
  static FILE uartout = {0};
  static FILE uartin = {0};
  
+ // Buffer for reading serial input
+ #define BUFFER_SIZE 32
+ static char commandBuffer[BUFFER_SIZE];
+ static int bufferIndex = 0;
+ 
  void stdio_init(unsigned long baud) {
      // Initialize serial
      Serial.begin(baud);
@@ -26,6 +31,10 @@
  }
  
  int uart_putchar(char c, FILE *stream) {
+     // Optionally convert newline to carriage return + newline
+     if (c == '\n') {
+         Serial.write('\r');
+     }
      Serial.write(c);
      return 0;
  }
@@ -41,46 +50,26 @@
  }
  
  bool stdio_readstring(char* buffer, size_t max_length) {
-     if (!stdio_available()) {
-         return false;
-     }
-     
-     size_t index = 0;
-     buffer[0] = '\0';
-     
-     // Wait for first character with timeout
-     unsigned long start_time = millis();
-     while (!stdio_available() && (millis() - start_time < 500));
-     
-     if (!stdio_available()) {
-         return false;
-     }
-     
-     // Read characters until newline or max length
-     while (stdio_available() && index < max_length - 1) {
-         char c = Serial.read();
-         
-         // Break on newline
-         if (c == '\n' || c == '\r') {
-             break;
-         }
-         
-         // Add character to buffer
-         buffer[index++] = c;
-         buffer[index] = '\0';
-         
-         // Small delay to ensure all data is read
-         delay(2);
-     }
-     
-     // Flush any remaining characters in the buffer (up to newline)
-     while (stdio_available()) {
+     while (Serial.available()) {
          char c = Serial.read();
          if (c == '\n' || c == '\r') {
-             break;
+             if (bufferIndex > 0) {
+                 commandBuffer[bufferIndex] = '\0'; // Terminate the string
+                 bufferIndex = 0; // Reset for next command
+                 // Copy to output buffer, respecting max_length
+                 strncpy(buffer, commandBuffer, max_length - 1);
+                 buffer[max_length - 1] = '\0'; // Ensure null-termination
+                 // Debug: Print the buffer
+                 printf("DEBUG: stdio_readstring buffer: '%s'\n", buffer);
+                 return true;
+             }
+             // Skip empty lines
+         } else {
+             if (bufferIndex < BUFFER_SIZE - 1) {
+                 commandBuffer[bufferIndex++] = c;
+             }
+             // Ignore characters if buffer is full
          }
-         delay(1);
      }
-     
-     return index > 0;
+     return false;
  }
